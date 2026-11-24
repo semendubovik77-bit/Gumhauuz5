@@ -6,17 +6,18 @@
   <title>Расписание уроков</title>
   <style>
     :root {
-      --bg: #0b1120;
-      --header-bg: #111827;
-      --card: #1e293b;
-      --border: #334155;
-      --accent: #38bdf8;
-      --accent2: #818cf8;
-      --highlight: #fbbf24;
-      --highlight-bg: rgba(251, 191, 36, 0.15);
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --row-alt: rgba(255,255,255,0.025);
+      --bg: #f0f4f8;
+      --header: #ffffff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --highlight: #f59e0b;
+      --highlight-bg: #fef3c7;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --row-alt: #f8fafc;
+      --shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,86 +33,88 @@
 
     /* ===== ШАПКА ===== */
     header {
-      background: var(--header-bg);
+      background: var(--header);
       border-bottom: 1px solid var(--border);
-      padding: 10px 20px;
+      box-shadow: var(--shadow);
+      padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      height: 72px;
+      height: 78px;
+      position: relative;
+      z-index: 20;
     }
 
     .header-left {
       display: flex;
       flex-direction: column;
       gap: 2px;
-      min-width: 180px;
+      min-width: 200px;
     }
     .title {
-      font-size: 1.35rem;
+      font-size: 1.45rem;
       font-weight: 700;
+      color: var(--text);
       letter-spacing: -0.03em;
     }
     .subtitle {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
+      font-weight: 500;
     }
 
-    .header-center {
-      text-align: center;
-    }
+    .header-center { text-align: center; }
     .clock {
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       color: var(--accent);
       line-height: 1;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
     }
     .date {
       font-size: 0.9rem;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .day-buttons {
       display: flex;
-      gap: 5px;
+      gap: 6px;
     }
     .day-btn {
-      background: transparent;
-      border: 1px solid var(--border);
+      background: #f1f5f9;
+      border: 1px solid transparent;
       color: var(--text-muted);
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
     .day-btn:hover {
-      border-color: var(--accent);
-      color: var(--text);
+      background: var(--accent-soft);
+      color: var(--accent);
     }
     .day-btn.active {
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      border-color: transparent;
+      background: var(--accent);
       color: white;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
-    /* ===== ТАБЛИЦА ===== */
+    /* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
     main {
-      height: calc(100vh - 72px);
-      padding: 12px 14px 14px;
+      height: calc(100vh - 78px);
+      padding: 14px 16px 16px;
     }
 
     .table-wrapper {
       height: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--border);
       background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -125,71 +128,85 @@
     }
 
     thead {
-      background: #0f172a;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
     }
 
     th {
       color: var(--text);
-      font-weight: 600;
-      font-size: 0.92rem;
-      padding: 10px 4px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 4px;
       border-bottom: 2px solid var(--border);
       text-align: center;
       white-space: nowrap;
     }
-    th:first-child { width: 48px; }
-    th:nth-child(2) { width: 100px; }
+    th:first-child { width: 52px; color: var(--accent); }
+    th:nth-child(2) { width: 105px; color: var(--text-muted); font-weight: 600; }
 
     td {
       padding: 6px 3px;
       text-align: center;
-      font-size: 0.78rem;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
       vertical-align: middle;
-      line-height: 1.25;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.25s ease;
     }
 
     td:first-child {
-      font-weight: 700;
-      font-size: 0.95rem;
+      font-weight: 800;
+      font-size: 1.05rem;
       color: var(--accent);
-      background: rgba(0,0,0,0.2);
+      background: #f8fafc;
     }
     td:nth-child(2) {
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       white-space: nowrap;
-      background: rgba(0,0,0,0.12);
+      background: #f8fafc;
+      font-weight: 500;
     }
 
-    tbody tr:nth-child(even) {
+    tbody tr:nth-child(even) td {
       background: var(--row-alt);
     }
+    tbody tr:nth-child(even) td:first-child,
+    tbody tr:nth-child(even) td:nth-child(2) {
+      background: #f1f5f9;
+    }
 
-    /* Подсветка текущего урока */
-    tr.current-lesson {
+    /* Текущий урок */
+    tr.current-lesson td {
       background: var(--highlight-bg) !important;
     }
-    tr.current-lesson td {
-      border-bottom-color: rgba(251, 191, 36, 0.25);
-    }
     tr.current-lesson td:first-child {
-      color: var(--highlight);
-      box-shadow: inset 3px 0 0 var(--highlight);
+      color: #b45309;
+      box-shadow: inset 4px 0 0 var(--highlight);
     }
 
-    /* Предметы */
-    .subject {
-      display: inline-block;
-      padding: 3px 5px;
-      border-radius: 5px;
-      background: rgba(255,255,255,0.05);
-      max-width: 100%;
+    /* ===== ДВЕ СТРОЧКИ В ЯЧЕЙКЕ ===== */
+    .cell-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 2px 1px;
+      line-height: 1.2;
+    }
+    .subject-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
       word-break: break-word;
+      max-width: 100%;
     }
-
+    .cabinet {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
     .empty {
-      color: #475569;
+      color: #cbd5e1;
+      font-size: 0.9rem;
     }
 
     .status {
@@ -200,20 +217,20 @@
       font-size: 1.3rem;
       color: var(--text-muted);
     }
-    .status.error { color: #f87171; }
+    .status.error { color: #ef4444; }
 
-    /* Адаптация под очень большие экраны */
+    /* Большие экраны */
     @media (min-width: 1800px) {
-      .clock { font-size: 2.8rem; }
-      th { font-size: 1.05rem; padding: 12px 5px; }
-      td { font-size: 0.88rem; padding: 8px 4px; }
-      .subject { padding: 4px 6px; }
+      .clock { font-size: 2.9rem; }
+      th { font-size: 1.05rem; padding: 14px 5px; }
+      .subject-name { font-size: 0.88rem; }
+      .cabinet { font-size: 0.78rem; }
+      td:first-child { font-size: 1.15rem; }
     }
-
     @media (min-width: 2400px) {
-      .clock { font-size: 3.2rem; }
-      th { font-size: 1.15rem; }
-      td { font-size: 0.98rem; }
+      .clock { font-size: 3.3rem; }
+      .subject-name { font-size: 0.98rem; }
+      .cabinet { font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -239,9 +256,6 @@
   </main>
 
   <script>
-    // ============================================================
-    // Твои ссылки
-    // ============================================================
     const CSV_URLS = {
       1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=2095345960&single=true&output=csv',
       2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=259046105&single=true&output=csv',
@@ -265,11 +279,9 @@
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
       if (lines.length < 2) return null;
-
       const parseRow = (line) => {
         const result = [];
-        let current = '';
-        let inQuotes = false;
+        let current = '', inQuotes = false;
         for (let i = 0; i < line.length; i++) {
           const char = line[i];
           if (char === '"') inQuotes = !inQuotes;
@@ -281,7 +293,6 @@
         result.push(current.trim());
         return result;
       };
-
       return {
         headers: parseRow(lines[0]),
         rows: lines.slice(1).map(parseRow).filter(r => r[0])
@@ -292,15 +303,39 @@
       if (!str) return null;
       const m = str.match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
       if (!m) return null;
-      return {
-        start: +m[1] * 60 + +m[2],
-        end: +m[3] * 60 + +m[4]
-      };
+      return { start: +m[1]*60 + +m[2], end: +m[3]*60 + +m[4] };
     }
 
     function getCurrentMinutes() {
       const n = new Date();
       return n.getHours() * 60 + n.getMinutes();
+    }
+
+    // Разбиваем "Математика (каб. 204)" на две строки
+    function formatCell(text) {
+      if (!text || !text.trim()) return '<span class="empty">—</span>';
+      text = text.trim();
+
+      // Ищем кабинет в скобках
+      const match = text.match(/^(.+?)\s*\((.+)\)$/);
+      if (match) {
+        return `
+          <div class="cell-content">
+            <div class="subject-name">${escapeHtml(match[1])}</div>
+            <div class="cabinet">${escapeHtml(match[2])}</div>
+          </div>`;
+      }
+      // Если просто текст без скобок
+      return `
+        <div class="cell-content">
+          <div class="subject-name">${escapeHtml(text)}</div>
+        </div>`;
+    }
+
+    function escapeHtml(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
     }
 
     function updateClock() {
@@ -318,8 +353,7 @@
       const url = CSV_URLS[dayIndex] + '&_t=' + Date.now();
       try {
         if (!isAuto) {
-          document.getElementById('table-wrapper').innerHTML =
-            '<div class="status">Загрузка...</div>';
+          document.getElementById('table-wrapper').innerHTML = '<div class="status">Загрузка...</div>';
         }
         const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -355,22 +389,13 @@
         html += `<td>${num}</td><td>${time}</td>`;
 
         for (let i = 0; i < classHeaders.length; i++) {
-          const cell = (row[i + 2] || '').trim();
-          html += cell
-            ? `<td><span class="subject">${escapeHtml(cell)}</span></td>`
-            : `<td><span class="empty">—</span></td>`;
+          html += `<td>${formatCell(row[i + 2])}</td>`;
         }
         html += '</tr>';
       });
 
       html += '</tbody></table>';
       document.getElementById('table-wrapper').innerHTML = html;
-    }
-
-    function escapeHtml(t) {
-      const d = document.createElement('div');
-      d.textContent = t;
-      return d.innerHTML;
     }
 
     function renderDayButtons() {
