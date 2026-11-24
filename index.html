@@ -219,12 +219,12 @@
 
   <script>
     const CSV_URLS = {
-      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=695022118&single=true&output=csv',
-      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1137237229&single=true&output=csv',
-      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1541545742&single=true&output=csv',
-      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=484512173&single=true&output=csv',
-      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1945571657&single=true&output=csv',
-      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1665005282&single=true&output=csv'
+      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=447659120&single=true&output=csv',
+      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1359561729&single=true&output=csv',
+      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1303382761&single=true&output=csv',
+      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1120296331&single=true&output=csv',
+      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=699707641&single=true&output=csv',
+      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=503841237&single=true&output=csv'
     };
 
     const DAYS = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
@@ -268,17 +268,14 @@
       return n.getHours()*60 + n.getMinutes();
     }
 
-    function formatCell(text) {
-      if (!text || !text.trim()) return '<span class="empty">—</span>';
-      text = text.trim();
-      const m = text.match(/^(.+?)\s*\((.+)\)$/);
-      if (m) {
-        return `<div class="cell">
-                  <div class="subj">${esc(m[1])}</div>
-                  <div class="cab">${esc(m[2])}</div>
-                </div>`;
-      }
-      return `<div class="cell"><div class="subj">${esc(text)}</div></div>`;
+    function formatCell(subj, cab) {
+      subj = (subj || '').trim();
+      cab  = (cab  || '').trim();
+      if (!subj && !cab) return '<span class="empty">—</span>';
+      return `<div class="cell">
+                <div class="subj">${esc(subj || '—')}</div>
+                ${cab ? `<div class="cab">${esc(cab)}</div>` : ''}
+              </div>`;
     }
 
     function esc(t) {
@@ -316,12 +313,16 @@
 
     function buildTable(classList) {
       const { headers, rows } = scheduleData;
-      const allClasses = headers.slice(2);
-      const indexes = classList.map(c => allClasses.indexOf(c)).filter(i => i >= 0);
+      // headers: №, Время, 1А, Каб, 1Б, Каб, ...
+      const classIndexes = {}; // className → index of subject column
+      for (let i = 2; i < headers.length; i += 2) {
+        classIndexes[headers[i]] = i;
+      }
+
       const now = getCurrentMinutes();
 
       let html = '<table><thead><tr><th>№</th><th>Время</th>';
-      indexes.forEach(i => html += `<th>${allClasses[i]}</th>`);
+      classList.forEach(cls => html += `<th>${cls}</th>`);
       html += '</tr></thead><tbody>';
 
       rows.forEach(row => {
@@ -332,7 +333,18 @@
 
         html += `<tr class="${cur ? 'current-lesson' : ''}">`;
         html += `<td>${num}</td><td>${time}</td>`;
-        indexes.forEach(i => html += `<td>${formatCell(row[i+2])}</td>`);
+
+        classList.forEach(cls => {
+          const idx = classIndexes[cls];
+          if (idx === undefined) {
+            html += '<td><span class="empty">—</span></td>';
+          } else {
+            const subj = row[idx] || '';
+            const cab  = row[idx + 1] || '';
+            html += `<td>${formatCell(subj, cab)}</td>`;
+          }
+        });
+
         html += '</tr>';
       });
 
@@ -383,7 +395,7 @@
       setInterval(updateClock, 1000);
       setInterval(() => scheduleData && render(), 60000);
       loadSchedule(getTodayDayIndex());
-      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), 10000); // каждые 10 секунд
+      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), 10000);
     }
 
     init();
