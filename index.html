@@ -6,16 +6,17 @@
   <title>Расписание уроков</title>
   <style>
     :root {
-      --bg: #0f1419;
-      --card: #1a2332;
-      --header: #151d2a;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59, 130, 246, 0.15);
-      --highlight: #f59e0b;
-      --highlight-bg: rgba(245, 158, 11, 0.18);
-      --text: #e8eef7;
+      --bg: #0b1120;
+      --header-bg: #111827;
+      --card: #1e293b;
+      --border: #334155;
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --highlight: #fbbf24;
+      --highlight-bg: rgba(251, 191, 36, 0.15);
+      --text: #f1f5f9;
       --text-muted: #94a3b8;
-      --border: #2a3648;
+      --row-alt: rgba(255,255,255,0.025);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,179 +25,195 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      height: 100vh;
       overflow: hidden;
       user-select: none;
     }
 
+    /* ===== ШАПКА ===== */
     header {
-      background: var(--header);
+      background: var(--header-bg);
       border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
+      gap: 16px;
+      height: 72px;
     }
 
-    .header-left { display: flex; flex-direction: column; gap: 4px; }
-    .title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
-    .subtitle { font-size: 0.95rem; color: var(--text-muted); }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 180px;
+    }
+    .title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
 
-    .header-center { display: flex; align-items: center; gap: 28px; }
+    .header-center {
+      text-align: center;
+    }
     .clock {
-      font-size: 2.8rem;
+      font-size: 2.4rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
-      letter-spacing: 0.02em;
       color: var(--accent);
       line-height: 1;
+      letter-spacing: 0.02em;
     }
-    .date { font-size: 1.15rem; color: var(--text-muted); text-align: center; }
+    .date {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
 
-    .day-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-
+    .day-buttons {
+      display: flex;
+      gap: 5px;
+    }
     .day-btn {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
-    .day-btn:hover { border-color: var(--accent); color: var(--text); }
-    .day-btn.active {
-      background: var(--accent);
+    .day-btn:hover {
       border-color: var(--accent);
+      color: var(--text);
+    }
+    .day-btn.active {
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      border-color: transparent;
       color: white;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
     }
 
+    /* ===== ТАБЛИЦА ===== */
     main {
-      padding: 16px 20px 20px;
-      height: calc(100vh - 110px);
+      height: calc(100vh - 72px);
+      padding: 12px 14px 14px;
+    }
+
+    .table-wrapper {
+      height: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
-    .table-wrapper {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--card);
+    table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
     }
 
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    thead { position: sticky; top: 0; z-index: 10; }
+    thead {
+      background: #0f172a;
+    }
 
     th {
-      background: #1e2a3a;
       color: var(--text);
       font-weight: 600;
-      font-size: 1.05rem;
-      padding: 14px 8px;
+      font-size: 0.92rem;
+      padding: 10px 4px;
       border-bottom: 2px solid var(--border);
       text-align: center;
       white-space: nowrap;
     }
-    th:first-child, th:nth-child(2) { width: 70px; background: #182232; }
-    th:nth-child(2) { width: 130px; }
+    th:first-child { width: 48px; }
+    th:nth-child(2) { width: 100px; }
 
     td {
-      padding: 12px 8px;
+      padding: 6px 3px;
       text-align: center;
-      font-size: 0.98rem;
-      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
       vertical-align: middle;
-      line-height: 1.35;
-      transition: background 0.3s ease;
+      line-height: 1.25;
     }
+
     td:first-child {
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       color: var(--accent);
-      background: rgba(0,0,0,0.15);
+      background: rgba(0,0,0,0.2);
     }
     td:nth-child(2) {
-      font-size: 0.9rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
       white-space: nowrap;
-      background: rgba(0,0,0,0.08);
+      background: rgba(0,0,0,0.12);
     }
 
-    tr.current-lesson { background: var(--highlight-bg) !important; }
-    tr.current-lesson td { border-bottom-color: rgba(245, 158, 11, 0.3); }
+    tbody tr:nth-child(even) {
+      background: var(--row-alt);
+    }
+
+    /* Подсветка текущего урока */
+    tr.current-lesson {
+      background: var(--highlight-bg) !important;
+    }
+    tr.current-lesson td {
+      border-bottom-color: rgba(251, 191, 36, 0.25);
+    }
     tr.current-lesson td:first-child {
       color: var(--highlight);
-      box-shadow: inset 4px 0 0 var(--highlight);
+      box-shadow: inset 3px 0 0 var(--highlight);
     }
 
+    /* Предметы */
     .subject {
       display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.04);
+      padding: 3px 5px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.05);
       max-width: 100%;
+      word-break: break-word;
     }
-    .empty { color: #4b5563; }
 
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      height: 28px;
-    }
-    .page-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--border);
-      transition: all 0.3s ease;
-    }
-    .page-dot.active {
-      background: var(--accent);
-      transform: scale(1.3);
-    }
-    .page-info {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-left: 8px;
+    .empty {
+      color: #475569;
     }
 
     .status {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
       font-size: 1.3rem;
       color: var(--text-muted);
-      text-align: center;
     }
     .status.error { color: #f87171; }
 
-    .fade-in { animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    /* Адаптация под очень большие экраны */
+    @media (min-width: 1800px) {
+      .clock { font-size: 2.8rem; }
+      th { font-size: 1.05rem; padding: 12px 5px; }
+      td { font-size: 0.88rem; padding: 8px 4px; }
+      .subject { padding: 4px 6px; }
     }
 
-    @media (min-width: 1600px) {
-      .clock { font-size: 3.4rem; }
-      .title { font-size: 1.9rem; }
-      th { font-size: 1.2rem; padding: 16px 10px; }
-      td { font-size: 1.1rem; padding: 14px 10px; }
-    }
-    @media (min-width: 2200px) {
-      .clock { font-size: 4rem; }
-      th { font-size: 1.35rem; }
-      td { font-size: 1.25rem; }
+    @media (min-width: 2400px) {
+      .clock { font-size: 3.2rem; }
+      th { font-size: 1.15rem; }
+      td { font-size: 0.98rem; }
     }
   </style>
 </head>
@@ -208,10 +225,8 @@
     </div>
 
     <div class="header-center">
-      <div>
-        <div class="clock" id="clock">--:--:--</div>
-        <div class="date" id="date"></div>
-      </div>
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="date" id="date"></div>
     </div>
 
     <div class="day-buttons" id="day-buttons"></div>
@@ -219,41 +234,32 @@
 
   <main>
     <div class="table-wrapper" id="table-wrapper">
-      <div class="status" id="status">Загрузка расписания...</div>
+      <div class="status">Загрузка расписания...</div>
     </div>
-    <div class="pagination" id="pagination"></div>
   </main>
 
   <script>
     // ============================================================
-    // Твои ссылки на CSV (уже вставлены)
+    // Твои ссылки
     // ============================================================
     const CSV_URLS = {
-      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=2095345960&single=true&output=csv', // Понедельник
-      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=259046105&single=true&output=csv',   // Вторник
-      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=230619713&single=true&output=csv',   // Среда
-      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=536572254&single=true&output=csv',   // Четверг
-      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1913105634&single=true&output=csv',  // Пятница
-      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1325481260&single=true&output=csv'   // Суббота
+      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=2095345960&single=true&output=csv',
+      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=259046105&single=true&output=csv',
+      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=230619713&single=true&output=csv',
+      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=536572254&single=true&output=csv',
+      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1913105634&single=true&output=csv',
+      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1325481260&single=true&output=csv'
     };
 
-    // ============================================================
-    // Настройки
-    // ============================================================
-    const MAX_VISIBLE_CLASSES = 9;        // Сколько классов видно одновременно
-    const SLIDE_INTERVAL = 15000;         // Перелистывание классов (15 сек)
-    const REFRESH_INTERVAL = 30000;       // Обновление данных (30 сек)
     const DAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+    const REFRESH_INTERVAL = 30000;
 
     let currentDayIndex = null;
     let scheduleData = null;
-    let currentPage = 0;
-    let totalPages = 1;
-    let slideTimer = null;
 
     function getTodayDayIndex() {
       const d = new Date().getDay();
-      return d === 0 ? 1 : d; // Воскресенье → понедельник
+      return d === 0 ? 1 : d;
     }
 
     function parseCSV(text) {
@@ -266,109 +272,91 @@
         let inQuotes = false;
         for (let i = 0; i < line.length; i++) {
           const char = line[i];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
+          if (char === '"') inQuotes = !inQuotes;
+          else if (char === ',' && !inQuotes) {
             result.push(current.trim());
             current = '';
-          } else {
-            current += char;
-          }
+          } else current += char;
         }
         result.push(current.trim());
         return result;
       };
 
-      const headers = parseRow(lines[0]);
-      const rows = lines.slice(1).map(parseRow).filter(r => r[0]);
-      return { headers, rows };
+      return {
+        headers: parseRow(lines[0]),
+        rows: lines.slice(1).map(parseRow).filter(r => r[0])
+      };
     }
 
     function parseTimeRange(str) {
       if (!str) return null;
-      const match = str.match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
-      if (!match) return null;
+      const m = str.match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
+      if (!m) return null;
       return {
-        start: parseInt(match[1]) * 60 + parseInt(match[2]),
-        end: parseInt(match[3]) * 60 + parseInt(match[4])
+        start: +m[1] * 60 + +m[2],
+        end: +m[3] * 60 + +m[4]
       };
     }
 
     function getCurrentMinutes() {
-      const now = new Date();
-      return now.getHours() * 60 + now.getMinutes();
+      const n = new Date();
+      return n.getHours() * 60 + n.getMinutes();
     }
 
     function updateClock() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-      document.getElementById('date').textContent = now.toLocaleDateString('ru-RU', {
+      const n = new Date();
+      document.getElementById('clock').textContent =
+        String(n.getHours()).padStart(2,'0') + ':' +
+        String(n.getMinutes()).padStart(2,'0') + ':' +
+        String(n.getSeconds()).padStart(2,'0');
+      document.getElementById('date').textContent = n.toLocaleDateString('ru-RU', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
     }
 
     async function loadSchedule(dayIndex, isAuto = false) {
-      const url = CSV_URLS[dayIndex];
-      const fetchUrl = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
-
+      const url = CSV_URLS[dayIndex] + '&_t=' + Date.now();
       try {
-        if (!isAuto) showStatus('Загрузка...');
-        const res = await fetch(fetchUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const text = await res.text();
-        const data = parseCSV(text);
-        if (!data || data.rows.length === 0) {
-          showStatus('Нет данных в таблице', true);
-          return;
+        if (!isAuto) {
+          document.getElementById('table-wrapper').innerHTML =
+            '<div class="status">Загрузка...</div>';
         }
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = parseCSV(await res.text());
+        if (!data || !data.rows.length) throw new Error('Нет данных');
         scheduleData = data;
         currentDayIndex = dayIndex;
-        currentPage = 0;
         updateDayLabel();
         renderTable();
-        startSlideTimer();
-      } catch (err) {
-        console.error(err);
-        showStatus('Ошибка загрузки: ' + err.message, true);
+      } catch (e) {
+        document.getElementById('table-wrapper').innerHTML =
+          `<div class="status error">Ошибка: ${e.message}</div>`;
       }
-    }
-
-    function showStatus(msg, isError = false) {
-      document.getElementById('table-wrapper').innerHTML =
-        `<div class="status ${isError ? 'error' : ''}">${msg}</div>`;
-      document.getElementById('pagination').innerHTML = '';
     }
 
     function renderTable() {
       if (!scheduleData) return;
       const { headers, rows } = scheduleData;
       const classHeaders = headers.slice(2);
-      totalPages = Math.ceil(classHeaders.length / MAX_VISIBLE_CLASSES) || 1;
-
-      const start = currentPage * MAX_VISIBLE_CLASSES;
-      const visibleClasses = classHeaders.slice(start, start + MAX_VISIBLE_CLASSES);
       const nowMin = getCurrentMinutes();
 
-      let html = '<table class="fade-in"><thead><tr>';
-      html += '<th>№</th><th>Время</th>';
-      visibleClasses.forEach(cls => { html += `<th>${cls || '—'}</th>`; });
+      let html = '<table><thead><tr><th>№</th><th>Время</th>';
+      classHeaders.forEach(c => html += `<th>${c}</th>`);
       html += '</tr></thead><tbody>';
 
       rows.forEach(row => {
-        const lessonNum = row[0] || '';
-        const timeStr = row[1] || '';
-        const timeRange = parseTimeRange(timeStr);
-        const isCurrent = timeRange && nowMin >= timeRange.start && nowMin < timeRange.end;
+        const num = row[0] || '';
+        const time = row[1] || '';
+        const range = parseTimeRange(time);
+        const isCurrent = range && nowMin >= range.start && nowMin < range.end;
 
         html += `<tr class="${isCurrent ? 'current-lesson' : ''}">`;
-        html += `<td>${lessonNum}</td><td>${timeStr}</td>`;
+        html += `<td>${num}</td><td>${time}</td>`;
 
-        for (let i = 0; i < visibleClasses.length; i++) {
-          const cell = row[start + 2 + i] || '';
-          html += cell.trim()
+        for (let i = 0; i < classHeaders.length; i++) {
+          const cell = (row[i + 2] || '').trim();
+          html += cell
             ? `<td><span class="subject">${escapeHtml(cell)}</span></td>`
             : `<td><span class="empty">—</span></td>`;
         }
@@ -377,60 +365,29 @@
 
       html += '</tbody></table>';
       document.getElementById('table-wrapper').innerHTML = html;
-      renderPagination();
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function renderPagination() {
-      const el = document.getElementById('pagination');
-      if (totalPages <= 1) { el.innerHTML = ''; return; }
-      let html = '';
-      for (let i = 0; i < totalPages; i++) {
-        html += `<div class="page-dot ${i === currentPage ? 'active' : ''}"></div>`;
-      }
-      html += `<span class="page-info">${currentPage + 1} / ${totalPages}</span>`;
-      el.innerHTML = html;
-    }
-
-    function startSlideTimer() {
-      clearInterval(slideTimer);
-      if (totalPages <= 1) return;
-      slideTimer = setInterval(() => {
-        currentPage = (currentPage + 1) % totalPages;
-        renderTable();
-      }, SLIDE_INTERVAL);
+    function escapeHtml(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
     }
 
     function renderDayButtons() {
-      const container = document.getElementById('day-buttons');
+      const box = document.getElementById('day-buttons');
       let html = '';
       for (let i = 1; i <= 6; i++) {
-        html += `<button class="day-btn" data-day="${i}">${DAYS[i].slice(0, 2)}</button>`;
+        html += `<button class="day-btn" data-day="${i}">${DAYS[i].slice(0,2)}</button>`;
       }
-      container.innerHTML = html;
-      container.querySelectorAll('.day-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const day = parseInt(btn.dataset.day);
-          loadSchedule(day);
-          updateActiveButton(day);
-        });
-      });
-    }
-
-    function updateActiveButton(dayIndex) {
-      document.querySelectorAll('.day-btn').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.day) === dayIndex);
+      box.innerHTML = html;
+      box.querySelectorAll('.day-btn').forEach(btn => {
+        btn.onclick = () => loadSchedule(+btn.dataset.day);
       });
     }
 
     function updateDayLabel() {
-      const label = document.getElementById('day-label');
       const today = getTodayDayIndex();
+      const label = document.getElementById('day-label');
       if (currentDayIndex === today) {
         label.textContent = DAYS[currentDayIndex];
       } else if (new Date().getDay() === 0 && currentDayIndex === 1) {
@@ -438,21 +395,18 @@
       } else {
         label.textContent = DAYS[currentDayIndex] + ' (просмотр)';
       }
-      updateActiveButton(currentDayIndex);
+      document.querySelectorAll('.day-btn').forEach(b => {
+        b.classList.toggle('active', +b.dataset.day === currentDayIndex);
+      });
     }
 
     function init() {
       renderDayButtons();
       updateClock();
       setInterval(updateClock, 1000);
-      setInterval(() => { if (scheduleData) renderTable(); }, 60000);
-
-      const today = getTodayDayIndex();
-      loadSchedule(today);
-
-      setInterval(() => {
-        if (currentDayIndex) loadSchedule(currentDayIndex, true);
-      }, REFRESH_INTERVAL);
+      setInterval(() => scheduleData && renderTable(), 60000);
+      loadSchedule(getTodayDayIndex());
+      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), REFRESH_INTERVAL);
     }
 
     init();
