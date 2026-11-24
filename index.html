@@ -119,7 +119,7 @@
       text-align: center;
       white-space: nowrap;
     }
-    th:first-child { width: 44px; color: var(--accent); }
+    th:first-child { width: 52px; color: var(--accent); }
     th:nth-child(2) { width: 96px; color: var(--muted); font-weight: 600; }
 
     td {
@@ -131,7 +131,7 @@
 
     td:first-child {
       font-weight: 800;
-      font-size: 0.98rem;
+      font-size: 0.92rem;
       color: var(--accent);
       background: #f8fafc;
     }
@@ -313,8 +313,7 @@
 
     function buildTable(classList) {
       const { headers, rows } = scheduleData;
-      // headers: №, Время, 1А, Каб, 1Б, Каб, ...
-      const classIndexes = {}; // className → index of subject column
+      const classIndexes = {};
       for (let i = 2; i < headers.length; i += 2) {
         classIndexes[headers[i]] = i;
       }
@@ -331,8 +330,11 @@
         const range = parseTimeRange(time);
         const cur = range && now >= range.start && now < range.end;
 
+        // Короткое название для классного часа
+        const displayNum = (num === 'Классный час') ? 'Кл.час' : num;
+
         html += `<tr class="${cur ? 'current-lesson' : ''}">`;
-        html += `<td>${num}</td><td>${time}</td>`;
+        html += `<td>${displayNum}</td><td>${time}</td>`;
 
         classList.forEach(cls => {
           const idx = classIndexes[cls];
