@@ -30,7 +30,6 @@
       user-select: none;
     }
 
-    /* ===== ШАПКА ===== */
     header {
       background: var(--header);
       height: 70px;
@@ -76,7 +75,6 @@
       box-shadow: 0 4px 14px rgba(29,78,216,0.3);
     }
 
-    /* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
     main {
       height: calc(100vh - 70px);
       padding: 12px 14px;
@@ -103,7 +101,6 @@
       font-weight: 600;
       color: var(--muted);
       border-bottom: 1px solid var(--border);
-      letter-spacing: 0.02em;
     }
 
     table {
@@ -116,17 +113,17 @@
     th {
       background: #f8fafc;
       font-weight: 700;
-      font-size: 0.92rem;
-      padding: 8px 3px;
+      font-size: 0.9rem;
+      padding: 8px 2px;
       border-bottom: 2px solid var(--border);
       text-align: center;
       white-space: nowrap;
     }
-    th:first-child { width: 46px; color: var(--accent); }
-    th:nth-child(2) { width: 98px; color: var(--muted); font-weight: 600; }
+    th:first-child { width: 44px; color: var(--accent); }
+    th:nth-child(2) { width: 96px; color: var(--muted); font-weight: 600; }
 
     td {
-      padding: 5px 2px;
+      padding: 4px 2px;
       text-align: center;
       vertical-align: middle;
       border-bottom: 1px solid #f1f5f9;
@@ -134,12 +131,12 @@
 
     td:first-child {
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 0.98rem;
       color: var(--accent);
       background: #f8fafc;
     }
     td:nth-child(2) {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
       white-space: nowrap;
       background: #f8fafc;
@@ -150,14 +147,12 @@
     tr:nth-child(even) td:first-child,
     tr:nth-child(even) td:nth-child(2) { background: #f1f5f9; }
 
-    /* Текущий урок */
     tr.current-lesson td { background: var(--highlight-bg) !important; }
     tr.current-lesson td:first-child {
       color: #b45309;
       box-shadow: inset 4px 0 0 var(--highlight);
     }
 
-    /* ===== ЯЧЕЙКА: ПРЕДМЕТ + КАБИНЕТ ===== */
     .cell {
       display: flex;
       flex-direction: column;
@@ -167,21 +162,21 @@
       padding: 1px;
     }
     .subj {
-      font-size: 0.8rem;
+      font-size: 0.77rem;
       font-weight: 600;
       color: var(--text);
-      white-space: nowrap;          /* ← запрет переноса предмета */
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
     }
     .cab {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--muted);
       font-weight: 500;
       white-space: nowrap;
     }
-    .empty { color: #cbd5e1; font-size: 0.95rem; }
+    .empty { color: #cbd5e1; font-size: 0.9rem; }
 
     .status {
       height: 100%;
@@ -192,18 +187,16 @@
       color: var(--muted);
     }
 
-    /* Большие экраны */
     @media (min-width: 1800px) {
       .clock { font-size: 2.7rem; }
-      .subj { font-size: 0.9rem; }
-      .cab { font-size: 0.78rem; }
-      th { font-size: 1.02rem; }
-      td:first-child { font-size: 1.1rem; }
+      .subj { font-size: 0.86rem; }
+      .cab { font-size: 0.75rem; }
+      th { font-size: 0.98rem; }
     }
     @media (min-width: 2300px) {
       .clock { font-size: 3.1rem; }
-      .subj { font-size: 1rem; }
-      .cab { font-size: 0.85rem; }
+      .subj { font-size: 0.95rem; }
+      .cab { font-size: 0.82rem; }
     }
   </style>
 </head>
@@ -235,9 +228,10 @@
     };
 
     const DAYS = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-    // Какие классы в какой блок (можно менять)
+
+    // Классы по блокам
     const TOP_CLASSES    = ['1А','1Б','2А','2Б','3А','3Б','4А','4Б','5А','5Б'];
-    const BOTTOM_CLASSES = ['6А','6Б','7А','7Б','8А','8Б','9А','9Б','10А','11А'];
+    const BOTTOM_CLASSES = ['6А','6Б','7А','7Б','7В','8А','8Б','9А','9Б','10А','11А'];
 
     let currentDayIndex = null;
     let scheduleData = null;
@@ -349,8 +343,7 @@
     }
 
     function render() {
-      const main = document.getElementById('main');
-      main.innerHTML = `
+      document.getElementById('main').innerHTML = `
         <div class="block">
           <div class="block-title">1 – 5 классы</div>
           ${buildTable(TOP_CLASSES)}
