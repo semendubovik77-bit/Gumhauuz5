@@ -219,12 +219,12 @@
 
   <script>
     const CSV_URLS = {
-      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=695022118&single=true&output=csv', // Понедельник
-      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1137237229&single=true&output=csv', // Вторник
-      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1541545742&single=true&output=csv', // Среда
-      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=484512173&single=true&output=csv', // Четверг
-      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1945571657&single=true&output=csv', // Пятница
-      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1665005282&single=true&output=csv'  // Суббота
+      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=695022118&single=true&output=csv',
+      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1137237229&single=true&output=csv',
+      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1541545742&single=true&output=csv',
+      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=484512173&single=true&output=csv',
+      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1945571657&single=true&output=csv',
+      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1665005282&single=true&output=csv'
     };
 
     const DAYS = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
@@ -383,7 +383,7 @@
       setInterval(updateClock, 1000);
       setInterval(() => scheduleData && render(), 60000);
       loadSchedule(getTodayDayIndex());
-      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), 30000);
+      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), 10000); // каждые 10 секунд
     }
 
     init();
