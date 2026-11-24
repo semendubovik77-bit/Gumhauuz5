@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Расписание уроков</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --header: #151d2a;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --highlight: #f59e0b;
+      --highlight-bg: rgba(245, 158, 11, 0.18);
+      --text: #e8eef7;
+      --text-muted: #94a3b8;
+      --border: #2a3648;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    header {
+      background: var(--header);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 4px; }
+    .title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+    .subtitle { font-size: 0.95rem; color: var(--text-muted); }
+
+    .header-center { display: flex; align-items: center; gap: 28px; }
+    .clock {
+      font-size: 2.8rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .date { font-size: 1.15rem; color: var(--text-muted); text-align: center; }
+
+    .day-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .day-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .day-btn:hover { border-color: var(--accent); color: var(--text); }
+    .day-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    main {
+      padding: 16px 20px 20px;
+      height: calc(100vh - 110px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-wrapper {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    thead { position: sticky; top: 0; z-index: 10; }
+
+    th {
+      background: #1e2a3a;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 1.05rem;
+      padding: 14px 8px;
+      border-bottom: 2px solid var(--border);
+      text-align: center;
+      white-space: nowrap;
+    }
+    th:first-child, th:nth-child(2) { width: 70px; background: #182232; }
+    th:nth-child(2) { width: 130px; }
+
+    td {
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 0.98rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      line-height: 1.35;
+      transition: background 0.3s ease;
+    }
+    td:first-child {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent);
+      background: rgba(0,0,0,0.15);
+    }
+    td:nth-child(2) {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      background: rgba(0,0,0,0.08);
+    }
+
+    tr.current-lesson { background: var(--highlight-bg) !important; }
+    tr.current-lesson td { border-bottom-color: rgba(245, 158, 11, 0.3); }
+    tr.current-lesson td:first-child {
+      color: var(--highlight);
+      box-shadow: inset 4px 0 0 var(--highlight);
+    }
+
+    .subject {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.04);
+      max-width: 100%;
+    }
+    .empty { color: #4b5563; }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      height: 28px;
+    }
+    .page-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s ease;
+    }
+    .page-dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
+    }
+    .page-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    .status {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .status.error { color: #f87171; }
+
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (min-width: 1600px) {
+      .clock { font-size: 3.4rem; }
+      .title { font-size: 1.9rem; }
+      th { font-size: 1.2rem; padding: 16px 10px; }
+      td { font-size: 1.1rem; padding: 14px 10px; }
+    }
+    @media (min-width: 2200px) {
+      .clock { font-size: 4rem; }
+      th { font-size: 1.35rem; }
+      td { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="title">Расписание уроков</div>
+      <div class="subtitle" id="day-label">Загрузка...</div>
+    </div>
+
+    <div class="header-center">
+      <div>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="date" id="date"></div>
+      </div>
+    </div>
+
+    <div class="day-buttons" id="day-buttons"></div>
+  </header>
+
+  <main>
+    <div class="table-wrapper" id="table-wrapper">
+      <div class="status" id="status">Загрузка расписания...</div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <script>
+    // ============================================================
+    // Твои ссылки на CSV (уже вставлены)
+    // ============================================================
+    const CSV_URLS = {
+      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=2095345960&single=true&output=csv', // Понедельник
+      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=259046105&single=true&output=csv',   // Вторник
+      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=230619713&single=true&output=csv',   // Среда
+      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=536572254&single=true&output=csv',   // Четверг
+      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1913105634&single=true&output=csv',  // Пятница
+      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1325481260&single=true&output=csv'   // Суббота
+    };
+
+    // ============================================================
+    // Настройки
+    // ============================================================
+    const MAX_VISIBLE_CLASSES = 9;        // Сколько классов видно одновременно
+    const SLIDE_INTERVAL = 15000;         // Перелистывание классов (15 сек)
+    const REFRESH_INTERVAL = 30000;       // Обновление данных (30 сек)
+    const DAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+
+    let currentDayIndex = null;
+    let scheduleData = null;
+    let currentPage = 0;
+    let totalPages = 1;
+    let slideTimer = null;
+
+    function getTodayDayIndex() {
+      const d = new Date().getDay();
+      return d === 0 ? 1 : d; // Воскресенье → понедельник
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length < 2) return null;
+
+      const parseRow = (line) => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      };
+
+      const headers = parseRow(lines[0]);
+      const rows = lines.slice(1).map(parseRow).filter(r => r[0]);
+      return { headers, rows };
+    }
+
+    function parseTimeRange(str) {
+      if (!str) return null;
+      const match = str.match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
+      if (!match) return null;
+      return {
+        start: parseInt(match[1]) * 60 + parseInt(match[2]),
+        end: parseInt(match[3]) * 60 + parseInt(match[4])
+      };
+    }
+
+    function getCurrentMinutes() {
+      const now = new Date();
+      return now.getHours() * 60 + now.getMinutes();
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+      document.getElementById('date').textContent = now.toLocaleDateString('ru-RU', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    async function loadSchedule(dayIndex, isAuto = false) {
+      const url = CSV_URLS[dayIndex];
+      const fetchUrl = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
+
+      try {
+        if (!isAuto) showStatus('Загрузка...');
+        const res = await fetch(fetchUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        const data = parseCSV(text);
+        if (!data || data.rows.length === 0) {
+          showStatus('Нет данных в таблице', true);
+          return;
+        }
+        scheduleData = data;
+        currentDayIndex = dayIndex;
+        currentPage = 0;
+        updateDayLabel();
+        renderTable();
+        startSlideTimer();
+      } catch (err) {
+        console.error(err);
+        showStatus('Ошибка загрузки: ' + err.message, true);
+      }
+    }
+
+    function showStatus(msg, isError = false) {
+      document.getElementById('table-wrapper').innerHTML =
+        `<div class="status ${isError ? 'error' : ''}">${msg}</div>`;
+      document.getElementById('pagination').innerHTML = '';
+    }
+
+    function renderTable() {
+      if (!scheduleData) return;
+      const { headers, rows } = scheduleData;
+      const classHeaders = headers.slice(2);
+      totalPages = Math.ceil(classHeaders.length / MAX_VISIBLE_CLASSES) || 1;
+
+      const start = currentPage * MAX_VISIBLE_CLASSES;
+      const visibleClasses = classHeaders.slice(start, start + MAX_VISIBLE_CLASSES);
+      const nowMin = getCurrentMinutes();
+
+      let html = '<table class="fade-in"><thead><tr>';
+      html += '<th>№</th><th>Время</th>';
+      visibleClasses.forEach(cls => { html += `<th>${cls || '—'}</th>`; });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach(row => {
+        const lessonNum = row[0] || '';
+        const timeStr = row[1] || '';
+        const timeRange = parseTimeRange(timeStr);
+        const isCurrent = timeRange && nowMin >= timeRange.start && nowMin < timeRange.end;
+
+        html += `<tr class="${isCurrent ? 'current-lesson' : ''}">`;
+        html += `<td>${lessonNum}</td><td>${timeStr}</td>`;
+
+        for (let i = 0; i < visibleClasses.length; i++) {
+          const cell = row[start + 2 + i] || '';
+          html += cell.trim()
+            ? `<td><span class="subject">${escapeHtml(cell)}</span></td>`
+            : `<td><span class="empty">—</span></td>`;
+        }
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      document.getElementById('table-wrapper').innerHTML = html;
+      renderPagination();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function renderPagination() {
+      const el = document.getElementById('pagination');
+      if (totalPages <= 1) { el.innerHTML = ''; return; }
+      let html = '';
+      for (let i = 0; i < totalPages; i++) {
+        html += `<div class="page-dot ${i === currentPage ? 'active' : ''}"></div>`;
+      }
+      html += `<span class="page-info">${currentPage + 1} / ${totalPages}</span>`;
+      el.innerHTML = html;
+    }
+
+    function startSlideTimer() {
+      clearInterval(slideTimer);
+      if (totalPages <= 1) return;
+      slideTimer = setInterval(() => {
+        currentPage = (currentPage + 1) % totalPages;
+        renderTable();
+      }, SLIDE_INTERVAL);
+    }
+
+    function renderDayButtons() {
+      const container = document.getElementById('day-buttons');
+      let html = '';
+      for (let i = 1; i <= 6; i++) {
+        html += `<button class="day-btn" data-day="${i}">${DAYS[i].slice(0, 2)}</button>`;
+      }
+      container.innerHTML = html;
+      container.querySelectorAll('.day-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const day = parseInt(btn.dataset.day);
+          loadSchedule(day);
+          updateActiveButton(day);
+        });
+      });
+    }
+
+    function updateActiveButton(dayIndex) {
+      document.querySelectorAll('.day-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.day) === dayIndex);
+      });
+    }
+
+    function updateDayLabel() {
+      const label = document.getElementById('day-label');
+      const today = getTodayDayIndex();
+      if (currentDayIndex === today) {
+        label.textContent = DAYS[currentDayIndex];
+      } else if (new Date().getDay() === 0 && currentDayIndex === 1) {
+        label.textContent = 'Расписание на понедельник';
+      } else {
+        label.textContent = DAYS[currentDayIndex] + ' (просмотр)';
+      }
+      updateActiveButton(currentDayIndex);
+    }
+
+    function init() {
+      renderDayButtons();
+      updateClock();
+      setInterval(updateClock, 1000);
+      setInterval(() => { if (scheduleData) renderTable(); }, 60000);
+
+      const today = getTodayDayIndex();
+      loadSchedule(today);
+
+      setInterval(() => {
+        if (currentDayIndex) loadSchedule(currentDayIndex, true);
+      }, REFRESH_INTERVAL);
+    }
+
+    init();
+  </script>
+</body>
+</html>
