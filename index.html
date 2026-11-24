@@ -6,18 +6,17 @@
   <title>Расписание уроков</title>
   <style>
     :root {
-      --bg: #f0f4f8;
-      --header: #ffffff;
+      --bg: #eef2f7;
       --card: #ffffff;
+      --header: #ffffff;
       --border: #e2e8f0;
-      --accent: #2563eb;
-      --accent-soft: #dbeafe;
-      --highlight: #f59e0b;
+      --accent: #1d4ed8;
+      --accent-light: #dbeafe;
+      --highlight: #d97706;
       --highlight-bg: #fef3c7;
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --row-alt: #f8fafc;
-      --shadow: 0 4px 20px rgba(0,0,0,0.06);
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow: 0 4px 24px rgba(0,0,0,0.06);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,90 +33,77 @@
     /* ===== ШАПКА ===== */
     header {
       background: var(--header);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 12px 24px;
+      height: 70px;
+      padding: 0 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 78px;
-      position: relative;
-      z-index: 20;
+      box-shadow: var(--shadow);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
     }
 
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 200px;
-    }
-    .title {
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.03em;
-    }
-    .subtitle {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
+    .header-left { display: flex; flex-direction: column; gap: 1px; }
+    .title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; }
+    .subtitle { font-size: 0.88rem; color: var(--muted); font-weight: 500; }
 
     .header-center { text-align: center; }
     .clock {
-      font-size: 2.5rem;
+      font-size: 2.35rem;
       font-weight: 700;
-      font-variant-numeric: tabular-nums;
       color: var(--accent);
+      font-variant-numeric: tabular-nums;
       line-height: 1;
-      letter-spacing: 0.03em;
     }
-    .date {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
+    .date { font-size: 0.88rem; color: var(--muted); margin-top: 2px; }
 
-    .day-buttons {
-      display: flex;
-      gap: 6px;
-    }
+    .day-buttons { display: flex; gap: 6px; }
     .day-btn {
       background: #f1f5f9;
-      border: 1px solid transparent;
-      color: var(--text-muted);
+      border: none;
+      color: var(--muted);
       padding: 8px 14px;
       border-radius: 10px;
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: 0.2s;
     }
-    .day-btn:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
+    .day-btn:hover { background: var(--accent-light); color: var(--accent); }
     .day-btn.active {
       background: var(--accent);
       color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      box-shadow: 0 4px 14px rgba(29,78,216,0.3);
     }
 
     /* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
     main {
-      height: calc(100vh - 78px);
-      padding: 14px 16px 16px;
+      height: calc(100vh - 70px);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .table-wrapper {
-      height: 100%;
+    .block {
+      flex: 1;
       background: var(--card);
-      border-radius: 16px;
+      border-radius: 14px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+    }
+
+    .block-title {
+      background: #f8fafc;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.02em;
     }
 
     table {
@@ -127,110 +113,97 @@
       table-layout: fixed;
     }
 
-    thead {
-      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-    }
-
     th {
-      color: var(--text);
+      background: #f8fafc;
       font-weight: 700;
-      font-size: 0.95rem;
-      padding: 12px 4px;
+      font-size: 0.92rem;
+      padding: 8px 3px;
       border-bottom: 2px solid var(--border);
       text-align: center;
       white-space: nowrap;
     }
-    th:first-child { width: 52px; color: var(--accent); }
-    th:nth-child(2) { width: 105px; color: var(--text-muted); font-weight: 600; }
+    th:first-child { width: 46px; color: var(--accent); }
+    th:nth-child(2) { width: 98px; color: var(--muted); font-weight: 600; }
 
     td {
-      padding: 6px 3px;
+      padding: 5px 2px;
       text-align: center;
       vertical-align: middle;
       border-bottom: 1px solid #f1f5f9;
-      transition: background 0.25s ease;
     }
 
     td:first-child {
       font-weight: 800;
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: var(--accent);
       background: #f8fafc;
     }
     td:nth-child(2) {
-      font-size: 0.82rem;
-      color: var(--text-muted);
+      font-size: 0.8rem;
+      color: var(--muted);
       white-space: nowrap;
       background: #f8fafc;
       font-weight: 500;
     }
 
-    tbody tr:nth-child(even) td {
-      background: var(--row-alt);
-    }
-    tbody tr:nth-child(even) td:first-child,
-    tbody tr:nth-child(even) td:nth-child(2) {
-      background: #f1f5f9;
-    }
+    tr:nth-child(even) td { background: #fafbfc; }
+    tr:nth-child(even) td:first-child,
+    tr:nth-child(even) td:nth-child(2) { background: #f1f5f9; }
 
     /* Текущий урок */
-    tr.current-lesson td {
-      background: var(--highlight-bg) !important;
-    }
+    tr.current-lesson td { background: var(--highlight-bg) !important; }
     tr.current-lesson td:first-child {
       color: #b45309;
       box-shadow: inset 4px 0 0 var(--highlight);
     }
 
-    /* ===== ДВЕ СТРОЧКИ В ЯЧЕЙКЕ ===== */
-    .cell-content {
+    /* ===== ЯЧЕЙКА: ПРЕДМЕТ + КАБИНЕТ ===== */
+    .cell {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 1px;
-      padding: 2px 1px;
-      line-height: 1.2;
+      padding: 1px;
     }
-    .subject-name {
-      font-size: 0.78rem;
+    .subj {
+      font-size: 0.8rem;
       font-weight: 600;
       color: var(--text);
-      word-break: break-word;
+      white-space: nowrap;          /* ← запрет переноса предмета */
+      overflow: hidden;
+      text-overflow: ellipsis;
       max-width: 100%;
     }
-    .cabinet {
+    .cab {
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--muted);
       font-weight: 500;
+      white-space: nowrap;
     }
-    .empty {
-      color: #cbd5e1;
-      font-size: 0.9rem;
-    }
+    .empty { color: #cbd5e1; font-size: 0.95rem; }
 
     .status {
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100%;
       font-size: 1.3rem;
-      color: var(--text-muted);
+      color: var(--muted);
     }
-    .status.error { color: #ef4444; }
 
     /* Большие экраны */
     @media (min-width: 1800px) {
-      .clock { font-size: 2.9rem; }
-      th { font-size: 1.05rem; padding: 14px 5px; }
-      .subject-name { font-size: 0.88rem; }
-      .cabinet { font-size: 0.78rem; }
-      td:first-child { font-size: 1.15rem; }
+      .clock { font-size: 2.7rem; }
+      .subj { font-size: 0.9rem; }
+      .cab { font-size: 0.78rem; }
+      th { font-size: 1.02rem; }
+      td:first-child { font-size: 1.1rem; }
     }
-    @media (min-width: 2400px) {
-      .clock { font-size: 3.3rem; }
-      .subject-name { font-size: 0.98rem; }
-      .cabinet { font-size: 0.85rem; }
+    @media (min-width: 2300px) {
+      .clock { font-size: 3.1rem; }
+      .subj { font-size: 1rem; }
+      .cab { font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -240,19 +213,15 @@
       <div class="title">Расписание уроков</div>
       <div class="subtitle" id="day-label">Загрузка...</div>
     </div>
-
     <div class="header-center">
       <div class="clock" id="clock">--:--:--</div>
       <div class="date" id="date"></div>
     </div>
-
     <div class="day-buttons" id="day-buttons"></div>
   </header>
 
-  <main>
-    <div class="table-wrapper" id="table-wrapper">
-      <div class="status">Загрузка расписания...</div>
-    </div>
+  <main id="main">
+    <div class="status">Загрузка расписания...</div>
   </main>
 
   <script>
@@ -265,8 +234,10 @@
       6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1325481260&single=true&output=csv'
     };
 
-    const DAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-    const REFRESH_INTERVAL = 30000;
+    const DAYS = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+    // Какие классы в какой блок (можно менять)
+    const TOP_CLASSES    = ['1А','1Б','2А','2Б','3А','3Б','4А','4Б','5А','5Б'];
+    const BOTTOM_CLASSES = ['6А','6Б','7А','7Б','8А','8Б','9А','9Б','10А','11А'];
 
     let currentDayIndex = null;
     let scheduleData = null;
@@ -280,23 +251,17 @@
       const lines = text.trim().split(/\r?\n/);
       if (lines.length < 2) return null;
       const parseRow = (line) => {
-        const result = [];
-        let current = '', inQuotes = false;
+        const r = []; let cur = ''; let q = false;
         for (let i = 0; i < line.length; i++) {
-          const char = line[i];
-          if (char === '"') inQuotes = !inQuotes;
-          else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
-          } else current += char;
+          const c = line[i];
+          if (c === '"') q = !q;
+          else if (c === ',' && !q) { r.push(cur.trim()); cur = ''; }
+          else cur += c;
         }
-        result.push(current.trim());
-        return result;
+        r.push(cur.trim());
+        return r;
       };
-      return {
-        headers: parseRow(lines[0]),
-        rows: lines.slice(1).map(parseRow).filter(r => r[0])
-      };
+      return { headers: parseRow(lines[0]), rows: lines.slice(1).map(parseRow).filter(r => r[0]) };
     }
 
     function parseTimeRange(str) {
@@ -308,31 +273,23 @@
 
     function getCurrentMinutes() {
       const n = new Date();
-      return n.getHours() * 60 + n.getMinutes();
+      return n.getHours()*60 + n.getMinutes();
     }
 
-    // Разбиваем "Математика (каб. 204)" на две строки
     function formatCell(text) {
       if (!text || !text.trim()) return '<span class="empty">—</span>';
       text = text.trim();
-
-      // Ищем кабинет в скобках
-      const match = text.match(/^(.+?)\s*\((.+)\)$/);
-      if (match) {
-        return `
-          <div class="cell-content">
-            <div class="subject-name">${escapeHtml(match[1])}</div>
-            <div class="cabinet">${escapeHtml(match[2])}</div>
-          </div>`;
+      const m = text.match(/^(.+?)\s*\((.+)\)$/);
+      if (m) {
+        return `<div class="cell">
+                  <div class="subj">${esc(m[1])}</div>
+                  <div class="cab">${esc(m[2])}</div>
+                </div>`;
       }
-      // Если просто текст без скобок
-      return `
-        <div class="cell-content">
-          <div class="subject-name">${escapeHtml(text)}</div>
-        </div>`;
+      return `<div class="cell"><div class="subj">${esc(text)}</div></div>`;
     }
 
-    function escapeHtml(t) {
+    function esc(t) {
       const d = document.createElement('div');
       d.textContent = t;
       return d.innerHTML;
@@ -350,52 +307,59 @@
     }
 
     async function loadSchedule(dayIndex, isAuto = false) {
-      const url = CSV_URLS[dayIndex] + '&_t=' + Date.now();
       try {
-        if (!isAuto) {
-          document.getElementById('table-wrapper').innerHTML = '<div class="status">Загрузка...</div>';
-        }
-        const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (!isAuto) document.getElementById('main').innerHTML = '<div class="status">Загрузка...</div>';
+        const res = await fetch(CSV_URLS[dayIndex] + '&_t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Ошибка сети');
         const data = parseCSV(await res.text());
         if (!data || !data.rows.length) throw new Error('Нет данных');
         scheduleData = data;
         currentDayIndex = dayIndex;
         updateDayLabel();
-        renderTable();
+        render();
       } catch (e) {
-        document.getElementById('table-wrapper').innerHTML =
-          `<div class="status error">Ошибка: ${e.message}</div>`;
+        document.getElementById('main').innerHTML = `<div class="status" style="color:#ef4444">${e.message}</div>`;
       }
     }
 
-    function renderTable() {
-      if (!scheduleData) return;
+    function buildTable(classList) {
       const { headers, rows } = scheduleData;
-      const classHeaders = headers.slice(2);
-      const nowMin = getCurrentMinutes();
+      const allClasses = headers.slice(2);
+      const indexes = classList.map(c => allClasses.indexOf(c)).filter(i => i >= 0);
+      const now = getCurrentMinutes();
 
       let html = '<table><thead><tr><th>№</th><th>Время</th>';
-      classHeaders.forEach(c => html += `<th>${c}</th>`);
+      indexes.forEach(i => html += `<th>${allClasses[i]}</th>`);
       html += '</tr></thead><tbody>';
 
       rows.forEach(row => {
         const num = row[0] || '';
         const time = row[1] || '';
         const range = parseTimeRange(time);
-        const isCurrent = range && nowMin >= range.start && nowMin < range.end;
+        const cur = range && now >= range.start && now < range.end;
 
-        html += `<tr class="${isCurrent ? 'current-lesson' : ''}">`;
+        html += `<tr class="${cur ? 'current-lesson' : ''}">`;
         html += `<td>${num}</td><td>${time}</td>`;
-
-        for (let i = 0; i < classHeaders.length; i++) {
-          html += `<td>${formatCell(row[i + 2])}</td>`;
-        }
+        indexes.forEach(i => html += `<td>${formatCell(row[i+2])}</td>`);
         html += '</tr>';
       });
 
       html += '</tbody></table>';
-      document.getElementById('table-wrapper').innerHTML = html;
+      return html;
+    }
+
+    function render() {
+      const main = document.getElementById('main');
+      main.innerHTML = `
+        <div class="block">
+          <div class="block-title">1 – 5 классы</div>
+          ${buildTable(TOP_CLASSES)}
+        </div>
+        <div class="block">
+          <div class="block-title">6 – 11 классы</div>
+          ${buildTable(BOTTOM_CLASSES)}
+        </div>
+      `;
     }
 
     function renderDayButtons() {
@@ -412,14 +376,11 @@
 
     function updateDayLabel() {
       const today = getTodayDayIndex();
-      const label = document.getElementById('day-label');
-      if (currentDayIndex === today) {
-        label.textContent = DAYS[currentDayIndex];
-      } else if (new Date().getDay() === 0 && currentDayIndex === 1) {
-        label.textContent = 'Расписание на понедельник';
-      } else {
-        label.textContent = DAYS[currentDayIndex] + ' (просмотр)';
-      }
+      const el = document.getElementById('day-label');
+      if (currentDayIndex === today) el.textContent = DAYS[currentDayIndex];
+      else if (new Date().getDay() === 0 && currentDayIndex === 1) el.textContent = 'Расписание на понедельник';
+      else el.textContent = DAYS[currentDayIndex] + ' (просмотр)';
+
       document.querySelectorAll('.day-btn').forEach(b => {
         b.classList.toggle('active', +b.dataset.day === currentDayIndex);
       });
@@ -429,9 +390,9 @@
       renderDayButtons();
       updateClock();
       setInterval(updateClock, 1000);
-      setInterval(() => scheduleData && renderTable(), 60000);
+      setInterval(() => scheduleData && render(), 60000);
       loadSchedule(getTodayDayIndex());
-      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), REFRESH_INTERVAL);
+      setInterval(() => currentDayIndex && loadSchedule(currentDayIndex, true), 30000);
     }
 
     init();
