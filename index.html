@@ -272,9 +272,19 @@
       subj = (subj || '').trim();
       cab  = (cab  || '').trim();
       if (!subj && !cab) return '<span class="empty">—</span>';
+
+      let cabText = '';
+      if (cab) {
+        if (cab.toLowerCase().includes('спорт') || cab.toLowerCase().includes('каб')) {
+          cabText = cab;
+        } else {
+          cabText = 'каб. ' + cab;
+        }
+      }
+
       return `<div class="cell">
                 <div class="subj">${esc(subj || '—')}</div>
-                ${cab ? `<div class="cab">${esc(cab)}</div>` : ''}
+                ${cabText ? `<div class="cab">${esc(cabText)}</div>` : ''}
               </div>`;
     }
 
@@ -329,8 +339,6 @@
         const time = row[1] || '';
         const range = parseTimeRange(time);
         const cur = range && now >= range.start && now < range.end;
-
-        // Короткое название для классного часа
         const displayNum = (num === 'Классный час') ? 'Кл.час' : num;
 
         html += `<tr class="${cur ? 'current-lesson' : ''}">`;
