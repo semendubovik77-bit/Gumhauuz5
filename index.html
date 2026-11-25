@@ -154,7 +154,7 @@
       box-shadow: inset 4px 0 0 var(--highlight);
     }
 
-    .zamen .subj { color: #047857; }
+    .zamen .subj { color: #047857; font-weight: 700; }
     .zamen .cab { color: #059669; }
     td.zamen-cell { background: var(--zamen-bg) !important; }
 
@@ -240,7 +240,8 @@
 
     let currentDayIndex = null;
     let scheduleData = null;
-    let zamenyData = [];
+    let zamenyData = [];          // никогда не очищаем до получения новых данных
+    let lastZamenyHash = '';      // чтобы не перерисовывать зря
 
     function getTodayDayIndex() {
       const d = new Date().getDay();
@@ -252,6 +253,12 @@
       return String(n.getDate()).padStart(2,'0') + '.' +
              String(n.getMonth()+1).padStart(2,'0') + '.' +
              n.getFullYear();
+    }
+
+    // Нормализация даты (убираем пробелы, разные разделители)
+    function normalizeDate(str) {
+      if (!str) return '';
+      return str.trim().replace(/[\/\-]/g, '.');
     }
 
     function parseCSV(text) {
@@ -321,11 +328,11 @@
       });
     }
 
-    // Загружаем замены отдельно (не сбрасываем старые данные сразу)
     async function loadZameny() {
       try {
         const res = await fetch(ZAMENY_URL + '&_t=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) return;
+        if (!res.ok) return; // если ошибка — оставляем старые замены
+
         const rows = parseCSV(await res.text());
         if (!rows) return;
 
@@ -343,10 +350,10 @@
         for (let i = start; i < rows.length; i++) {
           const r = rows[i];
           if (!r[0] || !r[1] || !r[2]) continue;
-          const date = r[0].trim();
+
+          const date = normalizeDate(r[0]);
           if (date === today) {
             newZameny.push({
-              date: date,
               class: r[1].trim(),
               lesson: r[2].trim(),
               subject: (r[3] || '').trim(),
@@ -355,24 +362,21 @@
           }
         }
 
-        zamenyData = newZameny;
-
-        // Если расписание уже загружено — просто перерисуем
-        if (scheduleData) render();
+        // Обновляем только если данные реально изменились
+        const newHash = JSON.stringify(newZameny);
+        if (newHash !== lastZamenyHash) {
+          lastZamenyHash = newHash;
+          zamenyData = newZameny;
+          if (scheduleData) render();
+        }
       } catch (e) {
-        console.log('Ошибка загрузки замен:', e);
+        // При ошибке просто оставляем старые замены
+        console.log('Замены: временная ошибка загрузки');
       }
     }
 
     async function loadSchedule(dayIndex, isAuto = false) {
       try {
-        if (!isAuto) {
-          // При ручном переключении показываем загрузку только если данных ещё нет
-          if (!scheduleData) {
-            document.getElementById('main').innerHTML = '<div class="status">Загрузка...</div>';
-          }
-        }
-
         const res = await fetch(CSV_URLS[dayIndex] + '&_t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('Ошибка сети');
         const rows = parseCSV(await res.text());
@@ -384,16 +388,19 @@
         };
         currentDayIndex = dayIndex;
         updateDayLabel();
-        render();   // рисуем сразу, замены уже есть в памяти
+        render();
       } catch (e) {
-        document.getElementById('main').innerHTML = `<div class="status" style="color:#ef4444">${e.message}</div>`;
+        if (!scheduleData) {
+          document.getElementById('main').innerHTML = `<div class="status" style="color:#ef4444">${e.message}</div>`;
+        }
       }
     }
 
     function getZamen(className, lessonNum) {
+      const lesson = String(lessonNum).trim();
       return zamenyData.find(z => 
         z.class === className && 
-        (z.lesson === String(lessonNum) || z.lesson === lessonNum)
+        (z.lesson === lesson || z.lesson === lessonNum)
       );
     }
 
@@ -446,7 +453,9 @@
       if (!scheduleData) return;
 
       const zamenCount = zamenyData.length;
-      const zamenInfo = zamenCount > 0 ? ` • <span style="color:#059669">Замен сегодня: ${zamenCount}</span>` : '';
+      const zamenInfo = zamenCount > 0 
+        ? ` • <span style="color:#059669">Замен сегодня: ${zamenCount}</span>` 
+        : '';
 
       document.getElementById('main').innerHTML = `
         <div class="block">
@@ -489,18 +498,17 @@
       updateClock();
       setInterval(updateClock, 1000);
 
-      // Сначала загружаем замены, потом расписание
-      loadZameny().then(() => {
-        loadSchedule(getTodayDayIndex());
-      });
+      // Загружаем замены и расписание
+      loadZameny();
+      loadSchedule(getTodayDayIndex());
 
-      // Обновление расписания и замен каждые 10 секунд
+      // Обновление каждые 12 секунд
       setInterval(() => {
-        if (currentDayIndex) loadSchedule(currentDayIndex, true);
         loadZameny();
-      }, 10000);
+        if (currentDayIndex) loadSchedule(currentDayIndex, true);
+      }, 12000);
 
-      // Подсветка текущего урока каждую минуту
+      // Подсветка текущего урока
       setInterval(() => scheduleData && render(), 60000);
     }
 
