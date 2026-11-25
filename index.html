@@ -240,8 +240,8 @@
 
     let currentDayIndex = null;
     let scheduleData = null;
-    let zamenyData = [];          // никогда не очищаем до получения новых данных
-    let lastZamenyHash = '';      // чтобы не перерисовывать зря
+    let zamenyData = [];
+    let lastZamenyHash = '';
 
     function getTodayDayIndex() {
       const d = new Date().getDay();
@@ -255,10 +255,16 @@
              n.getFullYear();
     }
 
-    // Нормализация даты (убираем пробелы, разные разделители)
     function normalizeDate(str) {
       if (!str) return '';
       return str.trim().replace(/[\/\-]/g, '.');
+    }
+
+    function clean(val) {
+      if (!val) return '';
+      val = String(val).trim();
+      if (val === '0' || val === '---' || val === '-' || val === '—') return '';
+      return val;
     }
 
     function parseCSV(text) {
@@ -291,8 +297,10 @@
     }
 
     function formatCell(subj, cab, isZamen = false) {
-      subj = (subj || '').trim();
-      cab  = (cab  || '').trim();
+      subj = clean(subj);
+      cab  = clean(cab);
+
+      // Если и предмет и кабинет пустые — просто прочерк
       if (!subj && !cab) return '<span class="empty">—</span>';
 
       let cabText = '';
@@ -331,7 +339,7 @@
     async function loadZameny() {
       try {
         const res = await fetch(ZAMENY_URL + '&_t=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) return; // если ошибка — оставляем старые замены
+        if (!res.ok) return;
 
         const rows = parseCSV(await res.text());
         if (!rows) return;
@@ -352,17 +360,25 @@
           if (!r[0] || !r[1] || !r[2]) continue;
 
           const date = normalizeDate(r[0]);
-          if (date === today) {
-            newZameny.push({
-              class: r[1].trim(),
-              lesson: r[2].trim(),
-              subject: (r[3] || '').trim(),
-              cabinet: (r[4] || '').trim()
-            });
-          }
+          if (date !== today) continue;
+
+          const subj = clean(r[3]);
+          const cab  = clean(r[4]);
+
+          // Если после очистки ничего не осталось — пропускаем (это был просто мусор)
+          if (!subj && !cab) continue;
+
+          newZameny.push({
+            class: r[1].trim(),
+            lesson: r[2].trim(),
+            subject: subj,
+            cabinet: cab
+          });
         }
 
-        // Обновляем только если данные реально изменились
+        // Сортируем для стабильного хэша
+        newZameny.sort((a, b) => (a.class + a.lesson).localeCompare(b.class + b.lesson));
+
         const newHash = JSON.stringify(newZameny);
         if (newHash !== lastZamenyHash) {
           lastZamenyHash = newHash;
@@ -370,8 +386,7 @@
           if (scheduleData) render();
         }
       } catch (e) {
-        // При ошибке просто оставляем старые замены
-        console.log('Замены: временная ошибка загрузки');
+        // оставляем старые данные
       }
     }
 
@@ -398,10 +413,7 @@
 
     function getZamen(className, lessonNum) {
       const lesson = String(lessonNum).trim();
-      return zamenyData.find(z => 
-        z.class === className && 
-        (z.lesson === lesson || z.lesson === lessonNum)
-      );
+      return zamenyData.find(z => z.class === className && z.lesson === lesson);
     }
 
     function buildTable(classList) {
@@ -436,9 +448,7 @@
           } else if (idx === undefined) {
             html += '<td><span class="empty">—</span></td>';
           } else {
-            const subj = row[idx] || '';
-            const cab  = row[idx + 1] || '';
-            html += `<td>${formatCell(subj, cab)}</td>`;
+            html += `<td>${formatCell(row[idx], row[idx + 1])}</td>`;
           }
         });
 
@@ -498,17 +508,14 @@
       updateClock();
       setInterval(updateClock, 1000);
 
-      // Загружаем замены и расписание
       loadZameny();
       loadSchedule(getTodayDayIndex());
 
-      // Обновление каждые 12 секунд
       setInterval(() => {
         loadZameny();
         if (currentDayIndex) loadSchedule(currentDayIndex, true);
-      }, 12000);
+      }, 15000); // чуть реже — меньше скачков
 
-      // Подсветка текущего урока
       setInterval(() => scheduleData && render(), 60000);
     }
 
