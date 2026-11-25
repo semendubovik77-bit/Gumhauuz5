@@ -17,6 +17,7 @@
       --text: #0f172a;
       --muted: #64748b;
       --shadow: 0 4px 24px rgba(0,0,0,0.06);
+      --zamen-bg: #ecfdf5;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -153,6 +154,11 @@
       box-shadow: inset 4px 0 0 var(--highlight);
     }
 
+    /* Подсветка замены */
+    .zamen .subj { color: #047857; }
+    .zamen .cab { color: #059669; }
+    td.zamen-cell { background: var(--zamen-bg) !important; }
+
     .cell {
       display: flex;
       flex-direction: column;
@@ -219,13 +225,15 @@
 
   <script>
     const CSV_URLS = {
-      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=447659120&single=true&output=csv',
-      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1359561729&single=true&output=csv',
-      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1303382761&single=true&output=csv',
-      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1120296331&single=true&output=csv',
-      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=699707641&single=true&output=csv',
-      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=503841237&single=true&output=csv'
+      1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=147080593&single=true&output=csv',
+      2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=116172814&single=true&output=csv',
+      3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=96572830&single=true&output=csv',
+      4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1127679919&single=true&output=csv',
+      5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1740432170&single=true&output=csv',
+      6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1169394762&single=true&output=csv'
     };
+
+    const ZAMENY_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFXgIBRY8C-6jrsy8sLU38Y0sOxlF0Np7WEW9T0qzGcJGeT1Eto3CCJc7mNMtLkypjcF5yZNuaeP1H/pub?gid=1223748245&single=true&output=csv';
 
     const DAYS = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
     const TOP_CLASSES    = ['1А','1Б','2А','2Б','3А','3Б','4А','4Б','5А','5Б'];
@@ -233,10 +241,18 @@
 
     let currentDayIndex = null;
     let scheduleData = null;
+    let zamenyData = []; // [{date, class, lesson, subject, cabinet}]
 
     function getTodayDayIndex() {
       const d = new Date().getDay();
       return d === 0 ? 1 : d;
+    }
+
+    function getTodayDateStr() {
+      const n = new Date();
+      return String(n.getDate()).padStart(2,'0') + '.' +
+             String(n.getMonth()+1).padStart(2,'0') + '.' +
+             n.getFullYear();
     }
 
     function parseCSV(text) {
@@ -253,7 +269,7 @@
         r.push(cur.trim());
         return r;
       };
-      return { headers: parseRow(lines[0]), rows: lines.slice(1).map(parseRow).filter(r => r[0]) };
+      return lines.map(parseRow);
     }
 
     function parseTimeRange(str) {
@@ -268,7 +284,7 @@
       return n.getHours()*60 + n.getMinutes();
     }
 
-    function formatCell(subj, cab) {
+    function formatCell(subj, cab, isZamen = false) {
       subj = (subj || '').trim();
       cab  = (cab  || '').trim();
       if (!subj && !cab) return '<span class="empty">—</span>';
@@ -282,7 +298,8 @@
         }
       }
 
-      return `<div class="cell">
+      const zamenClass = isZamen ? ' zamen' : '';
+      return `<div class="cell${zamenClass}">
                 <div class="subj">${esc(subj || '—')}</div>
                 ${cabText ? `<div class="cab">${esc(cabText)}</div>` : ''}
               </div>`;
@@ -305,20 +322,75 @@
       });
     }
 
+    async function loadZameny() {
+      try {
+        const res = await fetch(ZAMENY_URL + '&_t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return;
+        const rows = parseCSV(await res.text());
+        if (!rows) return;
+
+        // Ищем строку с заголовком "Дата"
+        let start = 0;
+        for (let i = 0; i < rows.length; i++) {
+          if (rows[i][0] && rows[i][0].toLowerCase().includes('дата')) {
+            start = i + 1;
+            break;
+          }
+        }
+
+        const today = getTodayDateStr();
+        zamenyData = [];
+
+        for (let i = start; i < rows.length; i++) {
+          const r = rows[i];
+          if (!r[0] || !r[1] || !r[2]) continue;
+          const date = r[0].trim();
+          if (date === today) {
+            zamenyData.push({
+              date: date,
+              class: r[1].trim(),
+              lesson: r[2].trim(),
+              subject: (r[3] || '').trim(),
+              cabinet: (r[4] || '').trim()
+            });
+          }
+        }
+      } catch (e) {
+        console.log('Ошибка загрузки замен:', e);
+      }
+    }
+
     async function loadSchedule(dayIndex, isAuto = false) {
       try {
         if (!isAuto) document.getElementById('main').innerHTML = '<div class="status">Загрузка...</div>';
-        const res = await fetch(CSV_URLS[dayIndex] + '&_t=' + Date.now(), { cache: 'no-store' });
+
+        // Загружаем и расписание, и замены параллельно
+        const [res, _] = await Promise.all([
+          fetch(CSV_URLS[dayIndex] + '&_t=' + Date.now(), { cache: 'no-store' }),
+          loadZameny()
+        ]);
+
         if (!res.ok) throw new Error('Ошибка сети');
-        const data = parseCSV(await res.text());
-        if (!data || !data.rows.length) throw new Error('Нет данных');
-        scheduleData = data;
+        const rows = parseCSV(await res.text());
+        if (!rows || rows.length < 2) throw new Error('Нет данных');
+
+        scheduleData = {
+          headers: rows[0],
+          rows: rows.slice(1).filter(r => r[0])
+        };
         currentDayIndex = dayIndex;
         updateDayLabel();
         render();
       } catch (e) {
         document.getElementById('main').innerHTML = `<div class="status" style="color:#ef4444">${e.message}</div>`;
       }
+    }
+
+    function getZamen(className, lessonNum) {
+      return zamenyData.find(z => 
+        z.class === className && 
+        (z.lesson === String(lessonNum) || z.lesson === lessonNum)
+      );
     }
 
     function buildTable(classList) {
@@ -346,7 +418,12 @@
 
         classList.forEach(cls => {
           const idx = classIndexes[cls];
-          if (idx === undefined) {
+          const zamen = getZamen(cls, num);
+
+          if (zamen) {
+            // Есть замена на сегодня
+            html += `<td class="zamen-cell">${formatCell(zamen.subject, zamen.cabinet, true)}</td>`;
+          } else if (idx === undefined) {
             html += '<td><span class="empty">—</span></td>';
           } else {
             const subj = row[idx] || '';
@@ -363,9 +440,12 @@
     }
 
     function render() {
+      const zamenCount = zamenyData.length;
+      const zamenInfo = zamenCount > 0 ? ` • <span style="color:#059669">Замен сегодня: ${zamenCount}</span>` : '';
+
       document.getElementById('main').innerHTML = `
         <div class="block">
-          <div class="block-title">1 – 5 классы</div>
+          <div class="block-title">1 – 5 классы${zamenInfo}</div>
           ${buildTable(TOP_CLASSES)}
         </div>
         <div class="block">
